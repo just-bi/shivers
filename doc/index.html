@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<!--
+
+Copyright 2017 just-bi.nl; Roland Bouman (roland.bouman@gmail.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-->
+  <head>
+    <meta http-equiv="Content-Type" content="type=text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>Hana Information View Visualizer - Documentation</title>
+    <link rel="stylesheet" type="text/css" href="../css/shivers.css"/>
+  </head>
+  <body
+    style="padding: 1em"
+  >
+    <h1>Welcome to Shivers!</h1>
+    <p>
+      Shivers is a utility for SAP/HANA developers to visualize SAP/HANA information views (analytic, attribute and calculation views) and their dependencies.
+      The name shivers stands for <b>S</b>ap <b>H</b>ana <b>I</b>nformation <b>V</b>iewers.
+    </p>
+    <p>
+      Shivers can be run from the local file system. You do not need a webserver.
+    </p>
+    <p>
+      To visualize HANA information views, use the open button on the toolbar.
+      Alternatively, drop HANA information vieww source files into the Shivers toolbar.
+    </p>
+    <p>
+      You will be prompted to provide the package to which your source files belong. 
+      You need to provide the package name yourself because this information cannot be extracted from the files directly.
+      Shivers needs to know the package name in order to resolve dependencies on other information views when visualizing.
+    </p>
+    <p>
+      After loading information views, shivers will parse the source files and display the loaded objects in the treeview.       
+      To visualize any particular information view, simply select one in the treeview by clicking it.
+      Shivers will try to evaluate any dependencies as far as it can.
+    </p>
+  </body>
+</html>
