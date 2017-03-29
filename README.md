@@ -36,3 +36,7 @@ Target audience is SAP/HANA developers, technical enterprise architects, SAP/HAN
 ### Why is your application called "Shivers"
 
 Shivers stands for Sap Hana Information Viewers. The name was conceived not unlike "Hadacol"'s was.
+
+### Under what license is shivers released?
+
+Shivers is open source under the Apache 2.0 License. You are free to copy, modify, distribute shivers provided you adhere to the apache 2.0 license.
