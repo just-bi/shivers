@@ -1,7 +1,10 @@
 # shivers
 SAP HANA Information View dependency graphs.
 
-This is a simple tool that for analyzing and visualizing dependencies between HANA information views (calculation views, attribute views, and analytic views) and their base objects (tables).
+Shivers is a simple tool that for analyzing and visualizing dependencies between HANA information views (calculation views, attribute views, and analytic views) and their base objects (tables).
+See the screenshot below to see what it looks like:
+
+![Shivers screenshot](doc/shivers-demo.png?raw=true "Shivers - Screenshot")
 
 Shivers is a single webpage that runs in the browser (tested: chrome 57 / Internet Explorer 11). 
 Shivers can be started by opening the index.html file directly from disk in your web browser.
