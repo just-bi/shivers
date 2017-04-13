@@ -129,7 +129,7 @@ var ShiversNetwork;
         }
         var associatedObjectUri = extractAttribute(sharedDimension, "associatedObjectUri");
         this.visualizeResourceUri(analyticViewNode, associatedObjectUri);
-      });
+      }.bind(this));
     }
   },
   visualizeAnalyticViewContents: function (analyticViewNode, viewData){
@@ -165,7 +165,7 @@ var ShiversNetwork;
           centralTableProxy = tableVisNodeData;
         }
       }
-    });
+    }.bind(this));
     if (centralTableProxy) {
       this.createVisEdgeData(analyticViewNode.id, centralTableProxy.id);
     }
