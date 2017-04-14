@@ -35,6 +35,7 @@ var ShiversNetwork;
       font: "18px verdana grey normal"
     };
     this.visNodes.push(visNodeData);
+    this.log.info("Created node " + this.visNodes.length + " with id: " + visNodeData.id + ".");
     return visNodeData;
   },
   createVisEdgeData: function(from, to){
@@ -46,6 +47,7 @@ var ShiversNetwork;
       physics: false
     };
     this.visEdges.push(visEdgeData);
+    this.log.info("Created edge " + this.visEdges.length + " from " + visEdgeData.from + " to " + visEdgeData.to + ".");
     return visEdgeData;
   },
   getVisNodeDataForTab: function (tab){
@@ -199,6 +201,7 @@ var ShiversNetwork;
         var type = extractAttribute(node, "type");
         switch (type) {
           case "ANALYTIC_VIEW":
+          case "ATTRIBUTE_VIEW":
           case "CALCULATION_VIEW":
             var resourceUri = extractText(node, "resourceUri");
             this.visualizeResourceUri(calculationViewNode, resourceUri);
@@ -230,8 +233,10 @@ var ShiversNetwork;
     method.call(this, viewNode, viewData);
   },
   visualizeView: function (tab, doc){
+    this.log.info("Visualizing view with id: " + tab.forTreeNode);
     var viewNode = this.getVisNodeDataForTab(tab);
     this.visualizeViewContents(viewNode, doc);
+    this.log.info("Visualizing a graph of " + this.visNodes.length + " nodes and " + this.visEdges.length + " edges.");
     this.visNetwork = new vis.Network(tab.component.getDom(), {
       nodes: new vis.DataSet(this.visNodes),
       edges: new vis.DataSet(this.visEdges)
@@ -251,6 +256,7 @@ var ShiversNetwork;
       }  
     });
     tab.shiversNetwork = this;
+    this.log.info("Done visualizing view with id: " + tab.forTreeNode);
   }
 };
 
