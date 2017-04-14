@@ -40,14 +40,32 @@ mainToolbar.getDom();
 
 var workArea = new ShiversTabPane();
 
-function appLog(msg){
-  var logTab = workArea.getLogTab();
-  var container = logTab.component.getDom();
-  var div = cEl("DIV", null, (new Date()).toLocaleString() + ": " + msg, container);
-  div.scrollIntoView();
-  console.log(msg);
+function appLog(msg, type){
+  var logTab = workArea.getTab(1);
+  if (logTab) {
+    var container = logTab.component.getDom();
+    var div = cEl("DIV", null, (new Date()).toLocaleString() + ": " + msg, container);
+    div.setAttribute("class", "log " + (type || ""));
+    div.scrollIntoView();
+  }
+  if (typeof(console[type]) === "function") {
+    console[type](msg);
+  }
+  else {
+    console.log(msg);
+  }
 }
-appLog("Shivers is loading...");
+
+function logInfo(msg) {
+  appLog(msg, "info");
+}
+function logError(msg) {
+  appLog(msg, "error");
+}
+function logWarning(msg) {
+  appLog(msg, "warn");
+}
+logInfo("Shivers is loading...");
 
 
 var tree = new ShiversTree();
@@ -120,15 +138,15 @@ function readFile(pkg, file){
   var reader = new FileReader();
   reader.onload = function(e){
     try {
-      appLog("Read file " + file.name + " (" + file.size + ")");
+      logInfo("Read file " + file.name + " (" + file.size + ")");
       var contents = e.target.result;
-      appLog("Parsing file " + file.name + " (" + file.size + ")");
+      logInfo("Parsing file " + file.name + " (" + file.size + ")");
       var doc = parseXml(contents);
-      appLog("Parsed file " + file.name + " (" + file.size + ")");
+      logInfo("Parsed file " + file.name + " (" + file.size + ")");
       tree.getOrCreateViewTreeNode(file, pkg, doc);
     }
     catch (e) {
-      appLog("Error occurred loading file " + file.name + ": " + e);
+      logError("Error occurred loading file " + file.name + ": " + e);
     }
   }
   reader.readAsText(file);  
@@ -145,7 +163,7 @@ function loadFile(pkg, file) {
       readFile(pkg, file);  
       break;
     default:
-      appLog("Warning: file " + name + " is not an information view source. Not loaded." );
+      logWarning("Warning: file " + name + " is not an information view source. Not loaded." );
   }
 }
 
@@ -164,18 +182,18 @@ function loadFiles(files) {
       pkg = pkg.replace(/\\/g, ".");
     }
   }
-  appLog("Using " + pkg + " as package name.");
+  logInfo("Using " + pkg + " as package name.");
   var i, n, file;
   for (i = 0, n = files.length; i < n; i++){
     file = files[i];
     if (file.kind) {
       if (file.kind !== "file") {
-        appLog("Warning: not loading item that is not a file.");
+        logWarning("Warning: not loading item that is not a file.");
         continue;
       }
       file = file.getAsFile();
     }
-    appLog("Loading file " + file.name + " (" + file.size + ")");
+    logInfo("Loading file " + file.name + " (" + file.size + ")");
     loadFile(pkg, file);    
   }
 }
@@ -198,11 +216,15 @@ tree.getTreeSelection().listen("selectionChanged", function(treeSelection, event
     tab = workArea.createTabForTreeNode(treeNode);
     new ShiversNetwork({
       tree: tree,
-      appLog: appLog
+      log: {
+        info: logInfo,
+        error: logError,
+        warn: logWarning
+      }
     }).visualizeView(tab, treeNode.getConf().metadata);
   }
 });
-appLog("Shivers is ready.");
+logInfo("Shivers is ready.");
 spinner.hide();
 linkCss("css/shivers.css");
 })(typeof(exports) === "undefined" ? window : exports);
