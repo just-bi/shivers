@@ -20,7 +20,7 @@ limitations under the License.
 var ShiversNetwork;
 (ShiversNetwork = function(conf){
   this.tree = conf.tree;
-  this.appLog = conf.appLog;
+  this.log = conf.log;
   this.visNodes = [];
   this.visEdges = [];
 }).prototype = {
@@ -114,7 +114,7 @@ var ShiversNetwork;
       }
       else {
         var msg = "Warning: no treenode found for attribute view " + visNode.id + ". Skipped.";
-        this.appLog(msg);
+        this.log.warn(msg);
       }
     }
     this.createVisEdgeData(viewNode.id, visNode.id);
@@ -124,7 +124,7 @@ var ShiversNetwork;
     if (sharedDimensions.childNodes) {
       sharedDimensions.childNodes.forEach(function(sharedDimension){
         if (sharedDimension.nodeName !== "logicalJoin"){
-          this.appLog("Found a " + sharedDimension.nodeName + " inside sharedDimensions.");
+          this.log.warn("Found a " + sharedDimension.nodeName + " inside sharedDimensions.");
           return;
         }
         var associatedObjectUri = extractAttribute(sharedDimension, "associatedObjectUri");
@@ -150,7 +150,7 @@ var ShiversNetwork;
     var centralTableProxy;
     tableProxies.childNodes.forEach(function(node, index){
       if (node.nodeName !== "tableProxy") {
-        this.appLog("Found a " + node.nodeName + " inside the tableProxies node.");
+        this.log.warn("Found a " + node.nodeName + " inside the tableProxies node.");
         return;
       }
       var tableNode = extractChildElement(node, "table");
@@ -174,7 +174,7 @@ var ShiversNetwork;
     if (joins.childNodes) {
       joins.childNodes.forEach(function(node, index){
         if (node.nodeName !== "join") {
-          this.appLog("Found a " + node.nodeName + " inside the joins node.");
+          this.log.warn("Found a " + node.nodeName + " inside the joins node.");
           return;
         }
         var leftTable = extractChildElement(node, "leftTable");
@@ -193,7 +193,7 @@ var ShiversNetwork;
     if (dataSources.childNodes) {
       dataSources.childNodes.forEach(function(node, index){
         if (node.nodeName !== "DataSource") {
-          this.appLog("Warning: found a " + node.nodeName + " node inside the datasources node. Skipping.");
+          this.log.warn("Warning: found a " + node.nodeName + " node inside the datasources node. Skipping.");
           return;
         }
         var type = extractAttribute(node, "type");
@@ -209,7 +209,7 @@ var ShiversNetwork;
             this.createVisEdgeData(calculationViewNode.id, columnObjectVisNodeData.id);
             break;
           default:
-            this.appLog("Warning: don't know how to handle DataSource nodes of type " + type + ". Skipping.");
+            this.log.warn("Warning: don't know how to handle DataSource nodes of type " + type + ". Skipping.");
             return;
         }
       }.bind(this));

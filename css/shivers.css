@@ -70,3 +70,15 @@ div.node.analyticview > .head > .toggle {
 div.node.calculationview  > .head > .toggle{
   background-image: url('../img/calculationview16x16.png');
 }
+
+div.log.info {
+  color: blue;
+}
+
+div.log.error {
+  color: red;
+}
+
+div.log.warn{
+  color: orange;
+}
