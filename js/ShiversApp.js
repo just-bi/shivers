@@ -30,8 +30,12 @@ var mainToolbar = new ShiversToolbar({
       loadFiles(data)
     },
     buttonPressed: function(toolbar, event, button){
-      if (button.conf.classes.indexOf("download") !== -1){
-        workArea.downloadCurrentNetworkAsImageFile();
+      switch (button.conf.classes[0]) {
+        case "clear-log":
+          clearLog();
+          break;
+        case "auto-layout":
+          break;
       }
     }
   }
@@ -40,8 +44,22 @@ mainToolbar.getDom();
 
 var workArea = new ShiversTabPane();
 
-function appLog(msg, type){
+function getLogTab(){
   var logTab = workArea.getTab(1);
+  return logTab;
+}
+
+function clearLog(){
+  var logTab = getLogTab();
+  if (!logTab) {
+    return;
+  }
+  var dom = logTab.component.getDom();
+  dom.innerHTML = "";
+}
+
+function appLog(msg, type){
+  var logTab = getLogTab();
   if (logTab) {
     var container = logTab.component.getDom();
     var div = cEl("DIV", null, (new Date()).toLocaleString() + ": " + msg, container);
@@ -138,11 +156,11 @@ function readFile(pkg, file){
   var reader = new FileReader();
   reader.onload = function(e){
     try {
-      logInfo("Read file " + file.name + " (" + file.size + ")");
+      logInfo("Read file " + file.name + " (" + file.size + " bytes)");
       var contents = e.target.result;
-      logInfo("Parsing file " + file.name + " (" + file.size + ")");
+      logInfo("Parsing file " + file.name + " (" + file.size + " bytes)");
       var doc = parseXml(contents);
-      logInfo("Parsed file " + file.name + " (" + file.size + ")");
+      logInfo("Parsed file " + file.name + " (" + file.size + " bytes)");
       tree.getOrCreateViewTreeNode(file, pkg, doc);
     }
     catch (e) {

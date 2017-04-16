@@ -37,7 +37,11 @@ var ShiversToolbar;
   }, this);
 
   this.addButton([
-    dom
+    dom,
+    new ToolbarButton({
+      "classes": ["clear-log"],
+      tooltip: "Clear log",
+    })
   ]);
   
 }).prototype = {
