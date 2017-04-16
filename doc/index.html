@@ -46,7 +46,18 @@ limitations under the License.
     <p>
       After loading information views, shivers will parse the source files and display the loaded objects in the treeview.       
       To visualize any particular information view, simply select one in the treeview by clicking it.
-      Shivers will try to evaluate any dependencies as far as it can.
+    </p>
+    <p>
+      Shivers visualizes dependencies as far as it can.
+      If it finds a reference to an object for which the source file was not already loaded, a warning will be printed in the log tab.
+      You can choose to load the sources for those missing objects afterwards. 
+      Tabs that were already opened will not refresh automatically, so if you want to visualize the information view again, close the tab and re-open it.
+    </p>
+    <p>
+      For more information about shivers, check out this blog: 
+      <a target="_blog" href="http://rpbouman.blogspot.nl/2017/03/announcing-shivers-visualizing-saphana.html">http://rpbouman.blogspot.nl/2017/03/announcing-shivers-visualizing-saphana.html</a>.
+      To contribute to the project, checkout its github repository: 
+      <a target="_github" href="https://github.com/just-bi/shivers">https://github.com/just-bi/shivers</a>.
     </p>
   </body>
 </html>
