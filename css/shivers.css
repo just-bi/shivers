@@ -82,3 +82,7 @@ div.log.error {
 div.log.warn{
   color: orange;
 }
+
+.toolbar-button.clear-log {
+  background-image: url('../img/log16x16.png');
+}
