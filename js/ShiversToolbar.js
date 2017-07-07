@@ -41,6 +41,22 @@ var ShiversToolbar;
     new ToolbarButton({
       "classes": ["clear-log"],
       tooltip: "Clear log",
+    }),
+    new ToolbarButton({
+      "classes": ["zip-package"],
+      tooltip: "Zip",
+    }),
+    new ToolbarButton({
+      "classes": ["rename-package"],
+      tooltip: "Rename Package. Package will be renamed and all references to the package will be updated.",
+    }),
+    new ToolbarButton({
+      "classes": ["rename-schema"],
+      tooltip: "Rename Schema. All references to the schema will be updated.",
+    }),
+    new ToolbarButton({
+      "classes": ["rename-view"],
+      tooltip: "Rename View(s). All references to the views will be updated.",
     })
   ]);
   

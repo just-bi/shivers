@@ -70,6 +70,7 @@ var ShiversNetwork;
       image: "img/" + conf.type + "128x128.png",
       //physics: false,
       physics: true,
+      type: conf.type,
       font: "18px verdana grey normal"
     };
     this.visNodes.push(visNodeData);
@@ -352,12 +353,30 @@ var ShiversNetwork;
         hierarchicalRepulsion: {
           nodeDistance: 150
         }*/
-      }  
+      },
+      manipulation: {
+        editNode: function(data, callback){
+          var type = data.type;
+          switch (type) {
+            case "package":
+              break;
+            case "schema":
+              break;
+            case "table":
+              break;
+            default:
+              alert("Don't know how to handle type " + type);
+          }
+          callback(data);
+        }
+      }
     });
     tab.shiversNetwork = this;
     this.log.info("Done visualizing view with id: " + tab.forTreeNode);
   }
 };
+
+adopt(ShiversTree, ContentPane);
 
 exports.ShiversNetwork = ShiversNetwork;
   
