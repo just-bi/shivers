@@ -24,14 +24,53 @@ var ShiversNetwork;
   this.visNodes = [];
   this.visEdges = [];
 }).prototype = {
-  createVisNodeData: function (pkg, name, type){
+  getVisNodeId: function(conf){
+    var id = "";
+    if (conf.packageName) {
+      id = conf.packageName;
+    }
+    if (conf.localName) {
+      if (id.length) {
+        id += "::";
+      }
+      id += conf.localName;
+    }
+    if (conf.schemaName) {
+      id = conf.schemaName + (id.length ? "." + id : "");
+    };
+    if (conf.type) {
+      id = conf.type + (id.length ? "-" + id : "");
+    }
+    return id;
+  },
+  getVisNodeLabel: function(conf){
+    var label;
+    switch (conf.type) {
+      case "schema":
+        label = conf.schemaName;
+        break;
+      case "package":
+        label = conf.packageName;
+        break;
+      case "table":
+        label = conf.schemaName + ".";
+        label += conf.packageName && conf.packageName.length ? conf.packageName + "::" : "";
+        label += conf.localName;        
+        break;
+      default:
+        label = conf.packageName + "\n" + conf.localName;
+    }
+    return label;
+  },
+  createVisNodeData: function (conf){
     var visNodeData = {
-      id: this.tree.getViewTreeNodeId(pkg, name, type),
-      label: pkg + "\n" + name,
+      id: this.getVisNodeId(conf),
+      label: this.getVisNodeLabel(conf),
       shape: "image",
-      image: "img/" + type + "128x128.png",
+      image: "img/" + conf.type + "128x128.png",
       //physics: false,
       physics: true,
+      type: conf.type,
       font: "18px verdana grey normal"
     };
     this.visNodes.push(visNodeData);
@@ -40,8 +79,8 @@ var ShiversNetwork;
   },
   createVisEdgeData: function(from, to){
     var visEdgeData = {
-      from: from,
-      to: to,
+      from: typeof(from) === "object" ? from.id : from,
+      to: typeof(to) === "object" ? to.id : to,
       arrows: "to",
       smooth: {type: "cubicBezier"},
       physics: false
@@ -57,19 +96,23 @@ var ShiversNetwork;
     parts = parts[3].split(".");
     var name = parts[0];
     var type = parts[1];
-    var visNodeData = this.createVisNodeData(pkg, name, type);
+    var visNodeData = this.getVisNodeData({
+      packageName: pkg, 
+      localName: name, 
+      type: type
+    });
     visNodeData.font = "18px verdana black bold";
     return visNodeData;
   },
-  findVisNodeData: function(pkg, name, type){
-    var visNodeId = this.tree.getViewTreeNodeId(pkg, name, type);
+  findVisNodeData: function(conf){
+    var visNodeId = this.getVisNodeId(conf);
     var existingVisNodeData = this.visNodes.filter(function(node, index){
       return node.id === visNodeId;
     });
     var visNodeData;
     switch (existingVisNodeData.length) {
       case 0:
-        visNodeData = null
+        visNodeData = null;
         break;
       case 1:
         visNodeData = existingVisNodeData[0];
@@ -79,16 +122,68 @@ var ShiversNetwork;
     }
     return visNodeData;
   },
-  getVisNodeData: function(pkg, name, type){
-    var visNodeData = this.findVisNodeData(pkg, name, type);
+  getVisNodeData: function(conf){
+    var visNodeData = this.findVisNodeData(conf);
     if (visNodeData === null) {
-      visNodeData = this.createVisNodeData(pkg, name, type);
+      visNodeData = this.createVisNodeData(conf);
+      if (conf.packageName && conf.packageName.length && conf.type !== "package") {
+        var packageNodeData, prevPackageNodeData;
+        var packageNameParts = conf.packageName.split(".");
+        packageNameParts.forEach(function(packageNamePart, index){
+          packageNodeData = this.getVisNodeDataForPackage(packageNameParts.slice(0, 1+index).join("."));
+          if (prevPackageNodeData) {
+            this.createVisEdgeData(packageNodeData, prevPackageNodeData);
+          }
+          prevPackageNodeData = packageNodeData;
+        }.bind(this));
+        this.createVisEdgeData(visNodeData, packageNodeData);
+      }
     }
     return visNodeData;
   },
+  getVisNodeDataForPackage: function(packageName){
+    //to do: create and connect subpackage.
+    var packageVisNodeData = this.getVisNodeData({
+      packageName: packageName,
+      type: "package"
+    });
+    return packageVisNodeData;
+  },
+  getVisNodeDataForSchema: function(name){
+    var schemaVisNodeData = this.getVisNodeData({
+      schemaName: name, 
+      type: "schema"
+    });
+    return schemaVisNodeData;
+  },
+  parseSchemaObjectName: function(schemaObjectName){
+    var colonColon = "::";
+    var indexOfColonColon = schemaObjectName.indexOf(colonColon);
+    var packageName;
+    if (indexOfColonColon !== -1) {
+      packageName = schemaObjectName.substr(0, indexOfColonColon);
+      schemaObjectName = schemaObjectName.substr(indexOfColonColon + colonColon.length);
+    }
+    return {
+      localName: schemaObjectName,
+      packageName: packageName
+    };
+  },
   getVisNodeDataForTableNode: function(tableNode){
     var attributes = extractAttributes(tableNode, ["schemaName", "columnObjectName"]);
-    var tableVisNodeData = this.getVisNodeData(attributes.schemaName, attributes.columnObjectName, "table");
+    var tableId = this.parseSchemaObjectName(attributes.columnObjectName);
+    var columnObjectInfo = {
+      packageName: tableId.packageName, 
+      localName: tableId.localName, 
+      schemaName: attributes.schemaName, 
+      type: "table"
+    };
+    var tableVisNodeData = this.findVisNodeData(columnObjectInfo);
+    if (!tableVisNodeData) {
+      tableVisNodeData = this.getVisNodeData(columnObjectInfo);
+      var schemaVisNodeData = this.getVisNodeDataForSchema(attributes.schemaName);
+      this.createVisEdgeData(tableVisNodeData, schemaVisNodeData);
+    }
     return tableVisNodeData;
   },
   parseResourceUri: function(resourceUri){
@@ -105,10 +200,15 @@ var ShiversNetwork;
   },
   visualizeResourceUri: function(viewNode, resourceUri){
     resourceUri = this.parseResourceUri(resourceUri);
-    var visNode = this.findVisNodeData(resourceUri.pkg, resourceUri.name, resourceUri.type);
+    var info = {
+      packageName: resourceUri.pkg, 
+      localName: resourceUri.name, 
+      type: resourceUri.type
+    };
+    var visNode = this.findVisNodeData(info);
 
     if (!visNode) {
-      visNode = this.createVisNodeData(resourceUri.pkg, resourceUri.name, resourceUri.type);
+      visNode = this.getVisNodeData(info);
       var treeNode = this.tree.getViewTreeNode(resourceUri.pkg, resourceUri.name, resourceUri.type);
       if (treeNode){
         var conf = treeNode.getConf();
@@ -253,12 +353,30 @@ var ShiversNetwork;
         hierarchicalRepulsion: {
           nodeDistance: 150
         }*/
-      }  
+      },
+      manipulation: {
+        editNode: function(data, callback){
+          var type = data.type;
+          switch (type) {
+            case "package":
+              break;
+            case "schema":
+              break;
+            case "table":
+              break;
+            default:
+              alert("Don't know how to handle type " + type);
+          }
+          callback(data);
+        }
+      }
     });
     tab.shiversNetwork = this;
     this.log.info("Done visualizing view with id: " + tab.forTreeNode);
   }
 };
+
+adopt(ShiversTree, ContentPane);
 
 exports.ShiversNetwork = ShiversNetwork;
   

@@ -86,3 +86,19 @@ div.log.warn{
 .toolbar-button.clear-log {
   background-image: url('../img/log16x16.png');
 }
+
+.toolbar-button.zip-package {
+  background-image: url('../img/zip16x16.png');
+}
+
+.toolbar-button.rename-package {
+  background-image: url('../img/package16x16.png');
+}
+
+.toolbar-button.rename-schema {
+  background-image: url('../img/schema16x16.png');
+}
+
+.toolbar-button.rename-view {
+  background-image: url('../img/rename_view16x16.png');
+}

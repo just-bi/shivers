@@ -49,6 +49,23 @@ var ShiversTree;
   getTreeSelection: function(){
     return this.treeSelection;
   },
+  getAllTreeNodes: function(){
+    var dom = this.getDom();
+    var childNode, treeNode, childNodes = dom.childNodes, n = childNodes.length, i;
+    var treeNodes = [];
+    for (i = 0; i < n; i++) {
+      childNode = childNodes[i];
+      treeNode = TreeNode.lookup(childNode);
+      if (treeNode) {
+        treeNodes.push(treeNode);
+      }
+    }
+    return treeNodes;
+  },
+  getPackageTreeNode: function(pkg){
+    var node = TreeNode.getInstance("node:" + pkg);
+    return node;
+  },
   getOrCreatePackageTreeNode: function(pkg){
     pkg = pkg.split(".");
     var packageNode;
@@ -118,7 +135,16 @@ var ShiversTree;
     }
     viewTreeNode.getConf().metadata = doc;
     return viewTreeNode;
-  }  
+  },
+  getTreeNodes: function(){
+    var dom = this.getDom(), treeNodes = [];
+    var domTreeNodes = dom.getElementsByClassName("node");    
+    var i, n = domTreeNodes.length;
+    for (i = 0; i < n; i++) {
+      treeNodes.push(TreeNode.lookup(domTreeNodes[i]));
+    }
+    return treeNodes;
+  }
 };
 adopt(ShiversTree, ContentPane);
 
